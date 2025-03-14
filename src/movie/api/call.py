@@ -1,5 +1,6 @@
 import os
 import requests
+import pandas as pd
 
 BASE_URL = "http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
 KEY = os.getenv("MOVIE_KEY")
@@ -28,3 +29,12 @@ def call_api(dt="20120101", url_params={}):
         return []
     return data
 
+def list2df(data : list, dt: str):
+    df = pd.DataFrame(data)
+    df["dt"] = dt  # 날짜 컬럼 추가
+    return df
+ 
+def save_df(df: pd.DataFrame, base_path) -> str:
+    df.to_parquet(base_path, partition_cols=['dt'])
+    save_path = f"{base_path}/dt={df['dt'][0]}"
+    return save_path
