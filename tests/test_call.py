@@ -18,5 +18,5 @@ def test_call_api():
     r = call_api()
     assert isinstance(r, list)
     assert isinstance(r[0]['rnum'], str)
-    assert len(list) == 10
+    assert len(r) == 10
     

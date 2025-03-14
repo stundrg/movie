@@ -18,5 +18,13 @@ def gen_url(dt="20120101",url_params={}):
         
     return url
 
-def call_api():
-    return []
+def call_api(dt="20120101", url_params={}): 
+    url = gen_url(dt, url_params)
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        data = response.json()['boxOfficeResult']['dailyBoxOfficeList']
+    else:
+        return []
+    return data
+
