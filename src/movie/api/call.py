@@ -31,8 +31,21 @@ def call_api(dt="20120101", url_params={}):
 
 def list2df(data : list, dt: str):
     df = pd.DataFrame(data)
+ 
+    num_cols = ['rnum', 'rank', 'rankInten', 'salesAmt', 'audiCnt',
+                'audiAcc', 'scrnCnt', 'showCnt', 'salesShare', 'salesInten',
+                'salesChange', 'audiInten', 'audiChange']
+    # for col_name in num_cols:
+    #     df[col_name] = pd.to_numeric(df[col_name])
+        
+    df[num_cols] = df[num_cols].apply(pd.to_numeric)
+ 
+ 
+ 
     df["dt"] = dt  # 날짜 컬럼 추가
     return df
+ 
+ 
  
 def save_df(df: pd.DataFrame, base_path) -> str:
     df.to_parquet(base_path, partition_cols=['dt'])
