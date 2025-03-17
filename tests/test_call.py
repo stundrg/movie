@@ -62,3 +62,17 @@ def test_list2df_check_num():
     for c in num_cols:
         assert df[c].dtype in ['float64', 'int64'],f"{c}가 숫자가 아님" # 숫자로 변환되었는지 확인
         assert is_numeric_dtype(df[c]), f"{c}가 숫자가 아님"  # 숫자로 변환되었는지 확인
+        
+    def test_save_df_url_param():
+        ymd = "20210101"
+        url_param = {"multiMovieYn": "Y"}
+        data = call_api(dt=ymd, url_param=url_param)
+        df = list2df(data, ymd, url_param)
+        base_path = "~/temp/movie"
+        ave_path = save_df(df, base_path, ["dt"] + list(url_param.keys()))
+        assert f"{base_path}/dt={ymd}" in save_path
+        print("save_path", save_path)
+        read_df = pd.read_parquet(save_path)
+        assert 'dt' not in read_df.columns
+        assert 'dt' in pd.read_parquet(base_path).columns
+ 

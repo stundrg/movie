@@ -5,7 +5,7 @@
 groups = ["default", "dev", "note", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:d8dc8fdeac5006ec28ac4202990cc938326ba94217ee55718e83fca848725d5e"
+content_hash = "sha256:b1cf6df2771c3ed730daacc2e0067397e2416efe94c41127040c82786961b627"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -426,16 +426,6 @@ groups = ["note"]
 files = [
     {file = "fastjsonschema-2.21.1-py3-none-any.whl", hash = "sha256:c9e5b7e908310918cf494a434eeb31384dd84a98b57a30bcb1f535015b554667"},
     {file = "fastjsonschema-2.21.1.tar.gz", hash = "sha256:794d4f0a58f848961ba16af7b9c85a3e88cd360df008c59aac6fc5ae9323b5d4"},
-]
-
-[[package]]
-name = "fastrequest"
-version = "1.6.3b0"
-requires_python = ">=3"
-summary = "fastrequest fast http requests extension"
-groups = ["default"]
-files = [
-    {file = "fastrequest-1.6.3b0.tar.gz", hash = "sha256:dd01fa09888e16d8cee83e055286d4f8e5d63d28b5ec5dc882e2da75fa664b51"},
 ]
 
 [[package]]
