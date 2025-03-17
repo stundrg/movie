@@ -21,10 +21,11 @@ def call_api(dt="20120101", url_param={}):
     j = data.json()
     return j['boxOfficeResult']['dailyBoxOfficeList']
 
-def list2df(data: list, dt: str, url_params={}):
+def list2df(data: list, dt: str, url_param={}):
     df = pd.DataFrame(data)
     df['dt'] = dt
-    for k,v in url_params.items():
+    # df['multiMovieYn'] = 'Y'
+    for k,v in url_param.items():
         df[k] = v
     
     num_cols = ['rnum', 'rank', 'rankInten', 'salesAmt', 'audiCnt',
