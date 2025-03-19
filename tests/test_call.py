@@ -1,5 +1,7 @@
 import pandas as pd
-from movie.api.call import gen_url, call_api, list2df, save_df ,fill_na_with_column , gen_unique, re_ranking
+from movie.api.call import (gen_url, call_api, list2df, save_df 
+                            ,fill_na_with_column , gen_unique, re_ranking,
+                            fill_unique_ranking)
 import os
 
 def test_gen_url_default():
@@ -97,9 +99,33 @@ def test_merge_df():
     df1 = fill_na_with_column(df,'multiMovieYn')
     assert df1['multiMovieYn'].isna().sum() == 5
     
-    df2 = fill_na_with_column(df,'repNationCd')
+    df2 = fill_na_with_column(df1,'repNationCd')
     assert df2['repNationCd'].isna().sum() == 5
     
     drop_columns = ['salesShare','rnum','salesChange','rank','rankInten']
     unique_df = gen_unique(df = df2, drop_columns = drop_columns)
     assert len(unique_df) == 25
+    
+def test_merge_df_save():
+    ds = "20240101"
+    PATH = f"~/data/movies/dailyboxoffice/dt={ds}"
+    
+    df = pd.read_parquet(PATH)
+    df1 = fill_na_with_column(df,'multiMovieYn')
+    df2 = fill_na_with_column(df1,'repNationCd')
+    drop_columns = ['salesShare','rnum','salesChange','rank','rankInten']
+    unique_df = gen_unique(df = df2, drop_columns = drop_columns)
+    
+    # merge.data --> /home/wsl/data/movies/merge/dailyboxoffice/dt=20240101
+    unique_df['dt'] = ds
+    base_path = "/home/wsl/temp/data/movies/merge/dailyboxoffice"
+    save_path = save_df(unique_df, base_path)
+    assert save_path == f"{base_path}/dt={ds}"
+    
+    
+def test_fill_unique_ranking():
+    ds = "20240101"
+    read_base = "/home/wsl/data/movies/dailyboxoffice"
+    save_base = "/home/wsl/temp/data/movies/merge/dailyboxoffice"
+    save_path = fill_unique_ranking(ds, read_base, save_base)
+    assert save_path == f"{save_base}/dt={ds}"

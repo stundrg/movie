@@ -66,3 +66,19 @@ def re_ranking(df: pd.DataFrame) -> pd.DataFrame:
     df["rank"] = df["audiCnt"].rank(method="min", ascending=False).astype(int)
     return df
 
+def fill_unique_ranking(ds: str, read_base, save_base):
+    PATH = f"{read_base}/dt={ds}"
+    
+    df = pd.read_parquet(PATH)
+    df1 = fill_na_with_column(df,'multiMovieYn')
+    df2 = fill_na_with_column(df1,'repNationCd')
+
+    drop_columns = ['salesShare','rnum','salesChange','rank','rankInten']
+    unique_df = gen_unique(df = df2, drop_columns = drop_columns)
+    
+    rdf = re_ranking(unique_df)
+
+    rdf['dt'] = ds
+    save_path = save_df(rdf, save_base)
+    return save_path
+
