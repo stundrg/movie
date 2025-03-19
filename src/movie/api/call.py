@@ -44,3 +44,25 @@ def save_df(df, base_path, partitions=['dt']):
     for p in partitions:
         save_path = save_path + f"/{p}={df[p][0]}"
     return save_path
+
+def fill_na_with_column(origin_df, c_name):
+    df = origin_df.copy()
+    for i, row in df.iterrows():
+            if pd.isna(row[c_name]):
+                same_movie_df = df[df["movieCd"] == row["movieCd"]]
+                notna_idx = same_movie_df[c_name].dropna().first_valid_index()
+                if notna_idx is not None:
+                    df.at[i, c_name] = df.at[notna_idx, c_name]
+    return df
+
+
+def gen_unique(df: pd.DataFrame, drop_columns: list) -> pd.DataFrame:
+    df_drop = df.drop(columns=['rnum', 'rank', 'rankInten', 'salesShare','salesChange'])
+    unique_df = df_drop.drop_duplicates(subset=['movieCd'])
+    return unique_df
+
+def re_ranking(df: pd.DataFrame) -> pd.DataFrame:
+    df["rnum"] = df["audiCnt"].rank(method="dense", ascending=False).astype(int)
+    df["rank"] = df["audiCnt"].rank(method="min", ascending=False).astype(int)
+    return df
+

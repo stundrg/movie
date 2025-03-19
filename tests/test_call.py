@@ -1,5 +1,5 @@
 import pandas as pd
-from movie.api.call import gen_url, call_api, list2df, save_df
+from movie.api.call import gen_url, call_api, list2df, save_df ,fill_na_with_column , gen_unique, re_ranking
 import os
 
 def test_gen_url_default():
@@ -89,3 +89,17 @@ def test_list2df_url_param():
     assert (df["multiMovieYn"] == "Y").all()
     assert (df["dt"] == ymd).all()
  
+def test_merge_df():
+    PATH = "~/data/movies/dailyboxoffice/dt=20240101"
+    df = pd.read_parquet(PATH)
+    assert len(df) == 50
+    
+    df1 = fill_na_with_column(df,'multiMovieYn')
+    assert df1['multiMovieYn'].isna().sum() == 5
+    
+    df2 = fill_na_with_column(df,'repNationCd')
+    assert df2['repNationCd'].isna().sum() == 5
+    
+    drop_columns = ['salesShare','rnum','salesChange','rank','rankInten']
+    unique_df = gen_unique(df = df2, drop_columns = drop_columns)
+    assert len(unique_df) == 25
