@@ -82,6 +82,22 @@ def fill_unique_ranking(ds: str, read_base, save_base):
     save_path = save_df(rdf, save_base)
     return save_path
 
+def load_meta_data(base_path):
+    """
+    기존 메타 데이터를 로드하는 함수
+    """
+    meta_path = os.path.join(base_path, "meta/meta.parquet")
+    return pd.read_parquet(meta_path) if os.path.exists(meta_path) else None
+
+def save_meta_data(base_path, df):
+    """
+    병합된 메타 데이터를 저장하는 함수
+    """
+    meta_path = os.path.join(base_path, "meta/meta.parquet")
+    os.makedirs(os.path.dirname(meta_path), exist_ok=True)
+    df.to_parquet(meta_path)
+    return meta_path
+
 def fillna_meta(previous_df, current_df):
     """ 
     이전 데이터를 활용하여 현재 데이터의 NaN 값을 채움 
@@ -99,10 +115,8 @@ def fillna_meta(previous_df, current_df):
         suffixes=("", "_prev")
     )
 
-    # multiMovieYn 결측치 채우기
+    # multiMovieYn 및 repNationCd 결측치 채우기
     merged_df["multiMovieYn"] = merged_df["multiMovieYn"].fillna(merged_df["multiMovieYn_prev"])
-
-    # repNationCd 결측치 채우기
     merged_df["repNationCd"] = merged_df["repNationCd"].fillna(merged_df["repNationCd_prev"])
 
     # 불필요한 _prev 컬럼 제거
@@ -110,42 +124,12 @@ def fillna_meta(previous_df, current_df):
 
     return merged_df
 
-def load_meta_data(base_path):
+def save_df(df, base_path, partitions=['dt']):
     """
-    기존 메타 데이터를 로드하는 함수
+    병합된 데이터를 저장하는 함수
     """
-    meta_path = os.path.join(base_path, "meta/meta.parquet")
-    return pd.read_parquet(meta_path) if os.path.exists(meta_path) else None
-
-
-def save_meta_data(base_path, df):
-    """
-    병합된 메타 데이터를 저장하는 함수
-    """
-    meta_path = os.path.join(base_path, "meta/meta.parquet")
-    os.makedirs(os.path.dirname(meta_path), exist_ok=True)
-    df.to_parquet(meta_path)
-    return meta_path
-
-def process_meta_data(base_path, ds_nodash):
-    """
-    기존 메타데이터와 새로운 데이터를 병합하고 저장하는 함수.
-    """
-    previous_df = load_meta_data(base_path)  # 기존 메타 데이터 로드
-
-    # 새로운 데이터 로드
-    current_path = os.path.join(base_path, f"dailyboxoffice/dt={ds_nodash}")
-    if not os.path.exists(current_path):
-        print(f"🚨 데이터 파일 없음: {current_path}")
-        return None
-
-    current_df = pd.read_parquet(current_path)
-
-    # 이전 데이터와 현재 데이터 병합하여 결측치 채움
-    merged_df = fillna_meta(previous_df, current_df)
-
-    # 병합된 데이터를 메타 데이터로 저장
-    save_path = save_meta_data(base_path, merged_df)
-
-    print(f"✅ 메타 데이터 저장 완료: {save_path}")
-    return merged_df
+    df.to_parquet(base_path, partition_cols=partitions)
+    save_path = base_path
+    for p in partitions:
+        save_path = save_path + f"/{p}={df[p][0]}"
+    return save_path
