@@ -67,6 +67,7 @@ def re_ranking(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def fill_unique_ranking(ds: str, read_base, save_base):
+    import pandas as pd
     PATH = f"{read_base}/dt={ds}"
     
     df = pd.read_parquet(PATH)
