@@ -83,6 +83,9 @@ def fill_unique_ranking(ds: str, read_base, save_base):
     return save_path
 
 def fillna_meta(previous_df, current_df):
+    """ 
+    이전 데이터를 활용하여 현재 데이터의 NaN 값을 채움 
+    """
     if previous_df is None:
         return current_df  # 이전 데이터가 없으면 현재 데이터 그대로 반환
 
@@ -128,7 +131,7 @@ def process_meta_data(base_path, ds_nodash):
     """
     기존 메타데이터와 새로운 데이터를 병합하고 저장하는 함수.
     """
-    previous_df = load_meta_data(base_path)
+    previous_df = load_meta_data(base_path)  # 기존 메타 데이터 로드
 
     # 새로운 데이터 로드
     current_path = os.path.join(base_path, f"dailyboxoffice/dt={ds_nodash}")
@@ -142,7 +145,7 @@ def process_meta_data(base_path, ds_nodash):
     merged_df = fillna_meta(previous_df, current_df)
 
     # 병합된 데이터를 메타 데이터로 저장
-    save_path = save_meta_data(merged_df, base_path)
+    save_path = save_meta_data(base_path, merged_df)
 
     print(f"✅ 메타 데이터 저장 완료: {save_path}")
     return merged_df
