@@ -86,14 +86,14 @@ def load_meta_data(base_path):
     """
     기존 메타 데이터를 로드하는 함수
     """
-    meta_path = os.path.join(base_path, "meta/meta.parquet")
+    meta_path = os.path.expanduser(f"{base_path}/meta/meta.parquet")
     return pd.read_parquet(meta_path) if os.path.exists(meta_path) else None
 
 def save_meta_data(base_path, df):
     """
     병합된 메타 데이터를 저장하는 함수
     """
-    meta_path = os.path.join(base_path, "meta/meta.parquet")
+    meta_path = os.path.expanduser(f"{base_path}/meta/meta.parquet")
     os.makedirs(os.path.dirname(meta_path), exist_ok=True)
     df.to_parquet(meta_path)
     return meta_path
@@ -124,12 +124,3 @@ def fillna_meta(previous_df, current_df):
 
     return merged_df
 
-def save_df(df, base_path, partitions=['dt']):
-    """
-    병합된 데이터를 저장하는 함수
-    """
-    df.to_parquet(base_path, partition_cols=partitions)
-    save_path = base_path
-    for p in partitions:
-        save_path = save_path + f"/{p}={df[p][0]}"
-    return save_path
