@@ -67,7 +67,6 @@ def re_ranking(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def fill_unique_ranking(ds: str, read_base, save_base):
-    import pandas as pd
     PATH = f"{read_base}/dt={ds}"
     
     df = pd.read_parquet(PATH)
@@ -87,6 +86,7 @@ def load_meta_data(base_path):
     """
     기존 메타 데이터를 로드하는 함수
     """
+    import pandas as pd
     meta_path = os.path.expanduser(f"{base_path}/meta/meta.parquet")
     return pd.read_parquet(meta_path) if os.path.exists(meta_path) else None
 
@@ -94,17 +94,17 @@ def save_meta_data(base_path, df):
     """
     병합된 메타 데이터를 저장하는 함수
     """
+    import pandas as pd
     meta_path = os.path.expanduser(f"{base_path}/meta/meta.parquet")
     os.makedirs(os.path.dirname(meta_path), exist_ok=True)
     df.to_parquet(meta_path)
     return meta_path
 
 def fillna_meta(previous_df, current_df):
-    
-    import pandas as pd
     """ 
     이전 데이터를 활용하여 현재 데이터의 NaN 값을 채움 
     """
+    import pandas as pd
     if previous_df is None:
         return current_df  # 이전 데이터가 없으면 현재 데이터 그대로 반환
 
