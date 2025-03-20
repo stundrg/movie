@@ -82,3 +82,8 @@ def fill_unique_ranking(ds: str, read_base, save_base):
     save_path = save_df(rdf, save_base)
     return save_path
 
+def gen_meta():
+    pass
+
+def gen_movie():
+    pass
