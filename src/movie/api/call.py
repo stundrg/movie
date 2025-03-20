@@ -100,6 +100,8 @@ def save_meta_data(base_path, df):
     return meta_path
 
 def fillna_meta(previous_df, current_df):
+    
+    import pandas as pd
     """ 
     이전 데이터를 활용하여 현재 데이터의 NaN 값을 채움 
     """
