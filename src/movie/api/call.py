@@ -82,8 +82,67 @@ def fill_unique_ranking(ds: str, read_base, save_base):
     save_path = save_df(rdf, save_base)
     return save_path
 
-def gen_meta():
-    pass
+def fillna_meta(previous_df, current_df):
+    if previous_df is None:
+        return current_df  # 이전 데이터가 없으면 현재 데이터 그대로 반환
 
-def gen_movie():
-    pass
+    merged_df = current_df.copy()
+
+    # movieCd를 기준으로 병합 (left join)
+    merged_df = merged_df.merge(
+        previous_df,
+        on="movieCd",
+        how="left",
+        suffixes=("", "_prev")
+    )
+
+    # multiMovieYn 결측치 채우기
+    merged_df["multiMovieYn"] = merged_df["multiMovieYn"].fillna(merged_df["multiMovieYn_prev"])
+
+    # repNationCd 결측치 채우기
+    merged_df["repNationCd"] = merged_df["repNationCd"].fillna(merged_df["repNationCd_prev"])
+
+    # 불필요한 _prev 컬럼 제거
+    merged_df.drop(columns=["multiMovieYn_prev", "repNationCd_prev"], inplace=True)
+
+    return merged_df
+
+def load_meta_data(base_path):
+    """
+    기존 메타 데이터를 로드하는 함수
+    """
+    meta_path = os.path.join(base_path, "meta/meta.parquet")
+    return pd.read_parquet(meta_path) if os.path.exists(meta_path) else None
+
+
+def save_meta_data(base_path, df):
+    """
+    병합된 메타 데이터를 저장하는 함수
+    """
+    meta_path = os.path.join(base_path, "meta/meta.parquet")
+    os.makedirs(os.path.dirname(meta_path), exist_ok=True)
+    df.to_parquet(meta_path)
+    return meta_path
+
+def process_meta_data(base_path, ds_nodash):
+    """
+    기존 메타데이터와 새로운 데이터를 병합하고 저장하는 함수.
+    """
+    previous_df = load_meta_data(base_path)
+
+    # 새로운 데이터 로드
+    current_path = os.path.join(base_path, f"dailyboxoffice/dt={ds_nodash}")
+    if not os.path.exists(current_path):
+        print(f"🚨 데이터 파일 없음: {current_path}")
+        return None
+
+    current_df = pd.read_parquet(current_path)
+
+    # 이전 데이터와 현재 데이터 병합하여 결측치 채움
+    merged_df = fillna_meta(previous_df, current_df)
+
+    # 병합된 데이터를 메타 데이터로 저장
+    save_path = save_meta_data(merged_df, base_path)
+
+    print(f"✅ 메타 데이터 저장 완료: {save_path}")
+    return merged_df
