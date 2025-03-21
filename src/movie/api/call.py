@@ -39,6 +39,7 @@ def list2df(data: list, dt: str, url_param={}):
     return df
 
 def save_df(df, base_path, partitions=['dt']):
+    import pandas as pd
     df.to_parquet(base_path, partition_cols=partitions)
     save_path = base_path
     for p in partitions:
