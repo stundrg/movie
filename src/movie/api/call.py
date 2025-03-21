@@ -47,6 +47,7 @@ def save_df(df, base_path, partitions=['dt']):
     return save_path
 
 def fill_na_with_column(origin_df, c_name):
+    import pandas as pd
     df = origin_df.copy()
     for i, row in df.iterrows():
             if pd.isna(row[c_name]):
@@ -58,6 +59,7 @@ def fill_na_with_column(origin_df, c_name):
 
 
 def gen_unique(df: pd.DataFrame, drop_columns: list) -> pd.DataFrame:
+    import pandas as pd
     df_drop = df.drop(columns=['rnum', 'rank', 'rankInten', 'salesShare','salesChange'])
     unique_df = df_drop.drop_duplicates(subset=['movieCd'])
     return unique_df
@@ -68,6 +70,7 @@ def re_ranking(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def fill_unique_ranking(ds: str, read_base, save_base):
+    import pandas as pd
     PATH = f"{read_base}/dt={ds}"
     
     df = pd.read_parquet(PATH)
