@@ -90,14 +90,18 @@ def load_meta_data(base_path):
     meta_path = os.path.expanduser(f"{base_path}/meta/meta.parquet")
     return pd.read_parquet(meta_path) if os.path.exists(meta_path) else None
 
-def save_meta_data(base_path, df):
-    """
-    병합된 메타 데이터를 저장하는 함수
-    """
+def save_meta_data(base_path, new_df):
     import pandas as pd
     meta_path = os.path.expanduser(f"{base_path}/meta/meta.parquet")
     os.makedirs(os.path.dirname(meta_path), exist_ok=True)
-    df.to_parquet(meta_path)
+
+    if os.path.exists(meta_path):
+        existing_df = pd.read_parquet(meta_path)
+        merged_df = pd.concat([existing_df, new_df]).drop_duplicates(subset=["movieCd"], keep="last")
+    else:
+        merged_df = new_df
+
+    merged_df.to_parquet(meta_path)
     return meta_path
 
 def fillna_meta(previous_df, current_df):
