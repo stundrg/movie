@@ -125,5 +125,10 @@ def fillna_meta(previous_df, current_df):
     # 불필요한 _prev 컬럼 제거
     merged_df.drop(columns=["multiMovieYn_prev", "repNationCd_prev"], inplace=True)
 
+
+    for col in ['multiMovieYn', 'repNationCd']:
+        merged_df[col] = merged_df.groupby('movieCd')[col] \
+                                  .transform(lambda x: x.ffill().bfill())
+
     return merged_df
 

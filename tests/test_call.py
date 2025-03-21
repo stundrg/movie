@@ -1,6 +1,7 @@
 import pandas as pd
 from movie.api.call import (gen_url, call_api, list2df, save_df 
                             ,fill_na_with_column , gen_unique, re_ranking,fillna_meta,
+                            load_meta_data, fillna_meta, save_meta_data,
                             fill_unique_ranking)
 import os
 
@@ -165,3 +166,4 @@ def test_fillna_meta_none_previous_df():
     r_df = fillna_meta(previous_df, current_df)
 
     assert r_df.equals(current_df), "r_df는 current_df와 동일해야 합니다!"
+    
