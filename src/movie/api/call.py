@@ -105,23 +105,27 @@ def save_meta_data(base_path, new_df):
     return meta_path
 
 def fillna_meta(previous_df, current_df):
+    """ 
+    이전 데이터를 활용하여 현재 데이터의 NaN 값을 채움 
+    """
     import pandas as pd
     if previous_df is None:
-        return current_df
+        return current_df  # 이전 데이터가 없으면 현재 데이터 그대로 반환
+
+    prev_df = previous_df[["movieCd", "multiMovieYn", "repNationCd"]].drop_duplicates("movieCd")
 
     merged_df = current_df.copy()
+
     merged_df = merged_df.merge(
-        previous_df,
+        prev_df,
         on="movieCd",
         how="left",
         suffixes=("", "_prev")
     )
+
     merged_df["multiMovieYn"] = merged_df["multiMovieYn"].fillna(merged_df["multiMovieYn_prev"])
     merged_df["repNationCd"] = merged_df["repNationCd"].fillna(merged_df["repNationCd_prev"])
-    merged_df.drop(columns=["multiMovieYn_prev", "repNationCd_prev"], inplace=True)
 
-    # ✅ 중복 제거
-    merged_df = merged_df.sort_values(by=["multiMovieYn", "repNationCd"], na_position='last')
-    merged_df = merged_df.drop_duplicates(subset="movieCd", keep="first")
+    merged_df.drop(columns=["multiMovieYn_prev", "repNationCd_prev"], inplace=True)
 
     return merged_df
