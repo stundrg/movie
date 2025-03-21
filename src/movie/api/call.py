@@ -101,26 +101,23 @@ def save_meta_data(base_path, df):
     return meta_path
 
 def fillna_meta(previous_df, current_df):
-    """
-    이전 데이터와 현재 데이터를 결합하고 movieCd 기준으로 결측치를 채움
-    """
     import pandas as pd
-
-    # 이전 데이터가 없으면 현재 데이터 그대로 반환
     if previous_df is None:
         return current_df
 
-    # 두 데이터프레임을 수직으로 결합
-    combined_df = pd.concat([previous_df, current_df], ignore_index=True)
+    merged_df = current_df.copy()
+    merged_df = merged_df.merge(
+        previous_df,
+        on="movieCd",
+        how="left",
+        suffixes=("", "_prev")
+    )
+    merged_df["multiMovieYn"] = merged_df["multiMovieYn"].fillna(merged_df["multiMovieYn_prev"])
+    merged_df["repNationCd"] = merged_df["repNationCd"].fillna(merged_df["repNationCd_prev"])
+    merged_df.drop(columns=["multiMovieYn_prev", "repNationCd_prev"], inplace=True)
 
-    # movieCd 기준으로 각 컬럼의 NaN을 채움 (가능한 값으로 forward/backward)
-    for col in ['multiMovieYn', 'repNationCd']:
-        combined_df[col] = (
-            combined_df.groupby('movieCd')[col]
-            .transform(lambda x: x.ffill().bfill())
-        )
+    # ✅ 중복 제거
+    merged_df = merged_df.sort_values(by=["multiMovieYn", "repNationCd"], na_position='last')
+    merged_df = merged_df.drop_duplicates(subset="movieCd", keep="first")
 
-    # 중복 제거: movieCd별로 하나만 남기고 나머지는 제거
-    combined_df = combined_df.drop_duplicates(subset='movieCd', keep='first')
-
-    return combined_df
+    return merged_df
