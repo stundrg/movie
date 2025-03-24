@@ -120,8 +120,8 @@ def fillna_meta(previous_df, current_df):
 
     merged_df = current_df.copy()
 
-    merged_df = merged_df.merge(
-        prev_df,
+    merged_df = current_df.merge(
+        previous_df,
         on="movieCd",
         how="left",
         suffixes=("", "_prev")
